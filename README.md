@@ -56,3 +56,47 @@ dependencies {
   kapt 'com.github.DrewCarlson.switchboard:generator:VERSION'
 }
 ```
+
+## Framework example
+Here is an example that generates switchboards suitable for [Mobius](https://github.com/spotify/mobius) `Update<M, E, F>` functions.
+In this example, we don't need any Effects, so we'll just use Unit but any non-primative type will work.
+```kotlin
+import com.spotify.mobius.Next
+import com.spotify.mobius.Update
+
+// A simple State model that holds a number.
+data class CounterModel(val count: Int)
+
+@Switchboard(
+    patchFunParams = [CounterModel::class],
+    patchFunParamNames = ["model"],
+    connectionBaseClass = MobiusCounterEvent::class,
+    connectionParamName = "event",
+    connectionReturnClass = Next::class,
+    connectionReturnProjections = [CounterModel::class, Unit::class]
+)
+sealed class MobiusCounterEvent {
+  object onInc : MobiusCounterEvent()
+  object onDec : MobiusCounterEvent()
+  data class onAdd(val number: Int) : MobiusCounterEvent()
+  data class onSub(val number: Int) : MobiusCounterEvent()
+}
+```
+The following switchboard will be generated.
+```kotlin
+import com.spotify.mobius.Next
+
+interface MobiusCounterEventSwitchboard {
+    fun patch(model: CounterModel, event: MobiusCounterEvent): Next<CounterModel, Unit> = when (event) {
+        MobiusCounterEvent.onInc -> onInc(model)
+        MobiusCounterEvent.onDec -> onDec(model)
+        is MobiusCounterEvent.onAdd -> onAdd(model, event)
+        is MobiusCounterEvent.onSub -> onSub(model, event)
+    }
+
+    fun onInc(model: CounterModel): Next<CounterModel, Unit>
+    fun onDec(model: CounterModel): Next<CounterModel, Unit>
+    fun onAdd(model: CounterModel, event: MobiusCounterEvent.onAdd): Next<CounterModel, Unit>
+    fun onSub(model: CounterModel, event: MobiusCounterEvent.onSub): Next<CounterModel, Unit>
+}
+```
