@@ -1,3 +1,5 @@
+[![Release](https://jitpack.io/v/DrewCarlson/switchboard.svg)](https://jitpack.io/#DrewCarlson/switchboard)
+
 # switchboard
 Generate Kotlin state mutation specs from sealed classes.
 
@@ -50,7 +52,7 @@ allprojects {
 Add the dependency:
 ```
 dependencies {
-  implementation 'com.github.DrewCarlson.switchboard:api:master-SNAPSHOT'
-  kapt 'com.github.DrewCarlson.switchboard:generator:master-SNAPSHOT'
+  implementation 'com.github.DrewCarlson.switchboard:api:VERSION'
+  kapt 'com.github.DrewCarlson.switchboard:generator:VERSION'
 }
 ```
