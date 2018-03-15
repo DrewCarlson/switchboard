@@ -1,7 +1,10 @@
 package io.hypno.switchboard
 
 
-data class CounterState(val count: Int = 0)
+data class CounterState(val count: Int = 0) {
+  operator fun plus(number: Int) = copy(count = count + number)
+  operator fun minus(number: Int) = copy(count = count - number)
+}
 
 @Switchboard(
     patchFunParams = [CounterState::class],
@@ -17,27 +20,20 @@ sealed class CounterEvent {
 }
 
 class CounterImpl : CounterEventSwitchboard {
-  override fun add(state: CounterState, connection: CounterEvent.Add) =
-      state.copy(count = state.count + connection.number)
+  override fun patch(state: CounterState, connection: CounterEvent) =
+      super.patch(state, connection).apply { println(this) }
 
-  override fun sub(state: CounterState, connection: CounterEvent.Sub) =
-      state.copy(count = state.count - connection.number)
-
-  override fun inc(state: CounterState) = state.copy(count = state.count + 1)
-  override fun dec(state: CounterState) = state.copy(count = state.count - 1)
+  override fun inc(state: CounterState) = state + 1
+  override fun dec(state: CounterState) = state - 1
+  override fun add(state: CounterState, connection: CounterEvent.Add) = state + connection.number
+  override fun sub(state: CounterState, connection: CounterEvent.Sub) = state - connection.number
 }
 
 fun main(args: Array<String>) {
-  val counter = CounterImpl()
-
-  var state = CounterState()
-  println("initial state: $state")
-  state = counter.patch(state, CounterEvent.Inc)
-  println("state($state) should equal 1")
-  state = counter.patch(state, CounterEvent.Dec)
-  println("state($state) should equal 0")
-  state = counter.patch(state, CounterEvent.Add(10))
-  println("state($state) should equal 10")
-  state = counter.patch(state, CounterEvent.Sub(10))
-  println("state($state) should equal 0")
+  CounterImpl().apply {
+    patch(CounterState(0), CounterEvent.Inc)
+    patch(CounterState(1), CounterEvent.Dec)
+    patch(CounterState(0), CounterEvent.Add(10))
+    patch(CounterState(10), CounterEvent.Sub(10))
+  }
 }
