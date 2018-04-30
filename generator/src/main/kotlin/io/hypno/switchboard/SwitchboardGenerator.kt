@@ -7,8 +7,8 @@ import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
 import me.eugeniomarletti.kotlin.metadata.classKind
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
-import org.jetbrains.kotlin.serialization.ProtoBuf
 import java.io.File
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
