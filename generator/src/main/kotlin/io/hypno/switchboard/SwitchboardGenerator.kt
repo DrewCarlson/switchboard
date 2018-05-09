@@ -113,7 +113,7 @@ class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils {
             .build())
         .build()
 
-    file.writeTo(File(generatedDir, "$fileName.kt"))
+    file.writeTo(generatedDir ?: throw IllegalStateException("Please use kapt."))
   }
 
   private fun logError(message: String) =
