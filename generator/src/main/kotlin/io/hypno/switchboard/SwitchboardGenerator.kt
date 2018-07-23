@@ -62,18 +62,26 @@ class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils {
                     .apply {
                       val params = spec.patchFunParamNames + spec.connectionParamName
                       val paramOnlyInsert = spec.patchFunParamNames
-                          .mapIndexed { index, s ->
+                          .mapIndexed { index, _ ->
                             if (index == 0) "%L" else ", %L"
                           }.joinToString("", "", "")
-                      val fullInsert = params.mapIndexed { index, s ->
+                      val fullInsert = params.mapIndexed { index, _ ->
                         if (index == 0) "%L" else ", %L"
                       }.joinToString("", "", "")
 
                       objects.forEach {
-                        addStatement("%T -> ${it.asFunName}($paramOnlyInsert)", it.asType().asTypeName(), *spec.patchFunParamNames)
+                        addStatement(
+                            "%T -> ${it.asFunName}($paramOnlyInsert)",
+                            it.asType().asTypeName(),
+                            *spec.patchFunParamNames
+                        )
                       }
                       dataClasses.forEach {
-                        addStatement("is %T -> ${it.asFunName}($fullInsert)", it.asType().asTypeName(), *params)
+                        addStatement(
+                            "is %T -> ${it.asFunName}($fullInsert)",
+                            it.asType().asTypeName(),
+                            *params
+                        )
                       }
 
                       if (requiresExhaustion) {
