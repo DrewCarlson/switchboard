@@ -17,13 +17,13 @@ annotation class Switchboard(
      */
     val patchFunParams: Array<KClass<*>> = [],
     /**
-     * An array of variable names for the corresponding {patchFunParams}.
+     * An array of variable names for the corresponding [patchFunParams].
      */
     val patchFunParamNames: Array<String> = [],
     /**
      * The base class for the Switchboards connection functions.
      * Generally this is the sealed class itself, a higher-level
-     * parent, or {Any}.
+     * parent, or [Any].
      */
     val connectionBaseClass: KClass<*> = Any::class,
     /**
@@ -36,7 +36,7 @@ annotation class Switchboard(
      */
     val connectionReturnClass: KClass<*> = Unit::class,
     /**
-     * Type projections applied to the {connectionReturnClass}.
+     * Type projections applied to the [connectionReturnClass].
      */
     val connectionReturnProjections: Array<KClass<*>> = []
 )
