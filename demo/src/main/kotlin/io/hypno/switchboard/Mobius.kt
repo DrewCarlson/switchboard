@@ -1,6 +1,7 @@
 package io.hypno.switchboard
 
 import com.spotify.mobius.*
+import com.spotify.mobius.Next.*
 import com.spotify.mobius.functions.Consumer
 
 data class CounterModel(val count: Int = 0) {
@@ -8,14 +9,9 @@ data class CounterModel(val count: Int = 0) {
   operator fun minus(number: Int) = copy(count = count - number)
 }
 
-@Switchboard(
-    patchFunParams = [CounterModel::class],
-    patchFunParamNames = ["model"],
-    connectionBaseClass = MobiusCounterEvent::class,
-    connectionParamName = "event",
-    connectionReturnClass = Next::class,
-    connectionReturnProjections = [(CounterModel::class), (Unit::class)]
-)
+@MobiusUpdateSpec(
+    prefix = "Counter",
+    baseModel = CounterModel::class)
 sealed class MobiusCounterEvent {
   object Inc : MobiusCounterEvent()
   object Dec : MobiusCounterEvent()
@@ -23,24 +19,23 @@ sealed class MobiusCounterEvent {
   data class Sub(val number: Int) : MobiusCounterEvent()
 }
 
-class MobiusUpdateFunc : Update<CounterModel, MobiusCounterEvent, Unit>,
-    MobiusCounterEventSwitchboard {
+class MobiusUpdateFunc : Update<CounterModel, MobiusCounterEvent, Any>, CounterUpdateSpec {
   override fun update(model: CounterModel, event: MobiusCounterEvent) = patch(model, event)
 
-  override fun inc(model: CounterModel): Next<CounterModel, Unit> = Next.next(model + 1)
-  override fun dec(model: CounterModel): Next<CounterModel, Unit> = Next.next(model - 1)
+  override fun inc(model: CounterModel): Next<CounterModel, Any> = next(model + 1)
+  override fun dec(model: CounterModel): Next<CounterModel, Any> = next(model - 1)
 
-  override fun add(model: CounterModel, event: MobiusCounterEvent.Add): Next<CounterModel, Unit> =
-      Next.next(model + event.number)
+  override fun add(model: CounterModel, event: MobiusCounterEvent.Add): Next<CounterModel, Any> =
+      next(model + event.number)
 
-  override fun sub(model: CounterModel, event: MobiusCounterEvent.Sub): Next<CounterModel, Unit> =
-      Next.next(model - event.number)
+  override fun sub(model: CounterModel, event: MobiusCounterEvent.Sub): Next<CounterModel, Any> =
+      next(model - event.number)
 }
 
-class EffectHandler : Connectable<Unit, MobiusCounterEvent> {
+class EffectHandler : Connectable<Any, MobiusCounterEvent> {
   override fun connect(output: Consumer<MobiusCounterEvent>) =
-      object : Connection<Unit> {
-        override fun accept(value: Unit) = Unit
+      object : Connection<Any> {
+        override fun accept(value: Any) = Unit
         override fun dispose() = Unit
       }
 }

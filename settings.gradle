@@ -1,2 +1,5 @@
-include ':generator', ':api', ':demo'
-
+include ':demo',
+    ':generator',
+    ':generator-mobius',
+    ':api',
+    ':api-mobius'

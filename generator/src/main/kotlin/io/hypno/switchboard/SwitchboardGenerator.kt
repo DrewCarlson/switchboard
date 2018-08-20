@@ -9,7 +9,6 @@ import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
-import java.io.File
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -17,44 +16,51 @@ import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
+import kotlin.reflect.KClass
 
 @AutoService(Processor::class)
-class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils {
+open class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils {
 
-  override fun getSupportedAnnotationTypes() = mutableSetOf(
-      Switchboard::class.java.name
-  )
+  /**
+   * 
+   */
+  protected open val processingHooks =
+      emptyMap<KClass<out Annotation>, (elements: Set<Element>) -> Unit>()
 
   override fun getSupportedSourceVersion() = SourceVersion.latest()!!
+  override fun getSupportedAnnotationTypes(): Set<String> =
+      mutableSetOf(Switchboard::class.qualifiedName!!) +
+          processingHooks.map { it.key.qualifiedName!! }
 
   private val procEnv: ProcessingEnvironment
     get() = (this as KotlinAbstractProcessor).processingEnv
 
   override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-    roundEnv.getElementsAnnotatedWith(Switchboard::class.java)
-        .forEach {
-          val switchboard = it.getAnnotation(Switchboard::class.java)
-          val className = it.simpleName.toString()
-          val pack = procEnv.elementUtils.getPackageOf(it).toString()
-          generateSwitchboard(it, SwitchboardSpec.fromAnnotation(switchboard), className, pack)
-        }
+    roundEnv.getElementsAnnotatedWith(Switchboard::class.java).forEach { element ->
+      val switchboard = element.getAnnotation(Switchboard::class.java)
+      element.generateSwitchboard(
+          spec = SwitchboardSpec.fromAnnotation(switchboard),
+          className = "${element.simpleName}Switchboard"
+      )
+    }
+    processingHooks.forEach { (annotationClass, processFunc) ->
+      roundEnv.getElementsAnnotatedWith(annotationClass.java).apply(processFunc)
+    }
     return true
   }
 
-  private fun generateSwitchboard(specElement: Element, spec: SwitchboardSpec, className: String, pack: String) {
-    val fileName = "${className}Switchboard"
-
-    val connections = specElement.enclosedElements.filter { it.kotlinMetadata != null }
+  protected fun Element.generateSwitchboard(spec: SwitchboardSpec, className: String) {
+    val connections = enclosedElements.filter { it.kotlinMetadata != null }
     val objects = connections.filter { it.classProto.classKind == ProtoBuf.Class.Kind.OBJECT }
     val dataClasses = connections.filter { it.classProto.isDataClass }
 
-    val requiresExhaustion = spec.isExhaustiveForElement(specElement) || connections.isEmpty()
+    val requiresExhaustion = spec.isExhaustiveForElement(this) || connections.isEmpty()
 
-    val file = FileSpec.builder(pack, fileName)
-        .addType(TypeSpec.interfaceBuilder(fileName)
+    val file = FileSpec.builder(packageName, className)
+        .addType(TypeSpec.interfaceBuilder(className)
             .addFunction(FunSpec.builder("patch")
                 .addParameters(spec.patchFunParamSpecs)
-                .addParameter(spec.connectionParamName, spec.connectionBaseClass)
+                .addParameter(spec.connectionParamName, spec.connectionBaseTypeName)
                 .addCode(CodeBlock.builder()
                     .indent()
                     .add("return when (%L) {\n", spec.connectionParamName)
@@ -98,7 +104,7 @@ class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils {
                 addFunction(FunSpec.builder("drop")
                     .addModifiers(KModifier.PUBLIC, KModifier.ABSTRACT)
                     .addParameters(spec.patchFunParamSpecs)
-                    .addParameter(spec.connectionParamName, spec.connectionBaseClass)
+                    .addParameter(spec.connectionParamName, spec.connectionBaseTypeName)
                     .returns(spec.connectionReturnTypeName)
                     .build())
               }
@@ -124,7 +130,7 @@ class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils {
     file.writeTo(generatedDir ?: throw IllegalStateException("Please use kapt."))
   }
 
-  private fun logError(message: String) =
+  protected fun logError(message: String) =
       procEnv.messager.printMessage(Diagnostic.Kind.ERROR, message)
 
   private val Element.asFunName: String
@@ -132,4 +138,7 @@ class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils {
 
   private val Element.classProto: ProtoBuf.Class
     get() = (kotlinMetadata as KotlinClassMetadata).data.classProto
+
+  private val Element.packageName
+    get() = procEnv.elementUtils.getPackageOf(this).toString()
 }

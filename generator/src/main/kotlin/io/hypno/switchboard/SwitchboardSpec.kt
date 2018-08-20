@@ -5,13 +5,13 @@ import safeClassName
 import safeTypeName
 import safeTypeNames
 import javax.lang.model.element.Element
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
 
 data class SwitchboardSpec(
-    val connectionBaseClass: TypeName,
+    val connectionBaseTypeName: TypeName,
     val connectionParamName: String,
     val connectionReturnClassName: ClassName,
-    val connectionReturnProjections: Array<TypeName>,
     val connectionReturnTypeName: TypeName,
     val patchFunParamNames: Array<String>,
     val patchFunParams: Array<Pair<String, TypeName>>
@@ -22,16 +22,15 @@ data class SwitchboardSpec(
       val connectionReturnClassName = switchboard.safeClassName { connectionReturnClass }
       val connectionReturnProjections = switchboard.safeTypeNames { connectionReturnProjections }
       return SwitchboardSpec(
-          connectionBaseClass = switchboard.safeTypeName(Switchboard::connectionBaseClass),
+          connectionBaseTypeName = switchboard.safeTypeName { connectionBaseClass },
           connectionParamName = switchboard.connectionParamName,
           connectionReturnClassName = connectionReturnClassName,
-          connectionReturnProjections = connectionReturnProjections,
           connectionReturnTypeName = if (connectionReturnProjections.isNotEmpty()) {
             // Apply projections
-            ParameterizedTypeName.get(connectionReturnClassName, *connectionReturnProjections)
+            connectionReturnClassName.parameterizedBy(*connectionReturnProjections)
           } else {
             // No types needed
-            switchboard.safeTypeName { this@safeTypeName.connectionReturnClass }
+            switchboard.safeTypeName { connectionReturnClass }
           },
           patchFunParamNames = patchFunParamNames,
           patchFunParams = switchboard.safeTypeNames { patchFunParams }
@@ -47,6 +46,6 @@ data class SwitchboardSpec(
     }
 
   fun isExhaustiveForElement(element: Element): Boolean {
-    return connectionBaseClass != element.asType().asTypeName()
+    return connectionBaseTypeName != element.asType().asTypeName()
   }
 }
