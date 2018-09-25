@@ -1,4 +1,5 @@
 [![Release](https://jitpack.io/v/DrewCarlson/switchboard.svg)](https://jitpack.io/#DrewCarlson/switchboard)
+[![CircleCI](https://circleci.com/gh/DrewCarlson/switchboard.svg?style=shield)](https://circleci.com/gh/DrewCarlson/switchboard)
 
 # switchboard
 Generate Kotlin state mutation specs from sealed classes.
