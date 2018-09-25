@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/android:api-28-alpha
+    working_directory: ~/switchboard
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: ./gradlew assemble
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - build
