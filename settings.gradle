@@ -2,4 +2,6 @@ include ':demo',
     ':generator',
     ':generator-mobius',
     ':api',
-    ':api-mobius'
+    ':api-common',
+    ':api-mobius',
+    ':api-mobius-common'

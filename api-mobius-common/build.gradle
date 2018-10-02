@@ -1,6 +1,5 @@
-apply plugin: 'kotlin-platform-jvm'
+apply plugin: 'kotlin-platform-common'
 
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  expectedBy project(":api-mobius-common")
 }
