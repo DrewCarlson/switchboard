@@ -1,5 +1,6 @@
 include ':demo',
     ':generator',
     ':generator-mobius',
+    ':generator-mobiuskt',
     ':api',
     ':api-mobius'
