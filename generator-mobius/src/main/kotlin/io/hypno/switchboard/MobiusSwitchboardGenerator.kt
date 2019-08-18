@@ -1,16 +1,16 @@
 package io.hypno.switchboard
 
 import asTypeElement
-import safeClassName
 import com.google.auto.service.AutoService
 import com.spotify.mobius.Next
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.asTypeName
+import safeClassName
 import javax.annotation.processing.Processor
 import javax.lang.model.element.Element
 import kotlin.reflect.KClass
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.asTypeName
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.asClassName
 
 @AutoService(Processor::class)
 class MobiusSwitchboardGenerator : SwitchboardGenerator() {
@@ -19,13 +19,13 @@ class MobiusSwitchboardGenerator : SwitchboardGenerator() {
       MobiusUpdateSpec::class to { elements ->
         elements.forEach { element ->
           val updateSpec = element.getAnnotation(MobiusUpdateSpec::class.java)
+          val prefix = when {
+            updateSpec.prefix.isNotBlank() -> updateSpec.prefix
+            else -> element.simpleName.removeSuffix("Event")
+          }
           element.generateSwitchboard(
               spec = updateSpec.asSwitchboardSpec(element),
-              className = when {
-                updateSpec.prefix.isNotBlank() ->
-                  "${updateSpec.prefix}UpdateSpec"
-                else -> "${element.simpleName}UpdateSpec"
-              }
+              className = "${prefix}UpdateSpec"
           )
         }
       },

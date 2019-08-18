@@ -29,6 +29,9 @@ annotation class MobiusUpdateSpec(
      * By default, generated specs will be prefixed
      * with the target's class name. Use this option
      * to manually define the prefix.
+     *
+     * If the class names ends with "Event" it will
+     * be omitted from the prefix.
      */
     val prefix: String = "",
     /**
