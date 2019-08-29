@@ -14,6 +14,8 @@ import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 import kotlin.reflect.KClass
@@ -53,6 +55,12 @@ open class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils
     val connections = enclosedElements.filter { it.kotlinMetadata != null }
     val objects = connections.filter { it.classProto.classKind == ProtoBuf.Class.Kind.OBJECT }
     val dataClasses = connections.filter { it.classProto.isDataClass }
+    val sealedClasses = connections.filter {
+        it.modifiers.contains(Modifier.ABSTRACT) &&
+                it.enclosedElements.any {
+                    innerElement -> innerElement.kind == ElementKind.CLASS
+                }
+    }
 
     val requiresExhaustion = spec.isExhaustiveForElement(this) || connections.isEmpty()
 
@@ -82,7 +90,7 @@ open class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils
                             *spec.patchFunParamNames
                         )
                       }
-                      dataClasses.forEach {
+                      (dataClasses + sealedClasses).forEach {
                         addStatement(
                             "is %T -> ${it.asFunName}($fullInsert)",
                             it.asType().asTypeName(),
@@ -117,6 +125,14 @@ open class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils
                   .build()
             })
             .addFunctions(dataClasses.map {
+              FunSpec.builder(it.asFunName)
+                  .addModifiers(KModifier.PUBLIC, KModifier.ABSTRACT)
+                  .addParameters(spec.patchFunParamSpecs)
+                  .addParameter(spec.connectionParamName, it.asType().asTypeName())
+                  .returns(spec.connectionReturnTypeName)
+                  .build()
+            })
+            .addFunctions(sealedClasses.map {
               FunSpec.builder(it.asFunName)
                   .addModifiers(KModifier.PUBLIC, KModifier.ABSTRACT)
                   .addParameters(spec.patchFunParamSpecs)
