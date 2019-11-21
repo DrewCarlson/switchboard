@@ -13,5 +13,4 @@ dependencies {
   implementation project(":api-mobius")
   implementation project(":generator")
   implementation 'kt.mobius:mobius-core-jvm:0.0.21'
-  kapt "com.google.auto.service:auto-service:1.0-rc6"
 }

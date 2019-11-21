@@ -1,18 +1,15 @@
 package io.hypno.switchboard
 
 import asTypeElement
-import com.google.auto.service.AutoService
 import com.spotify.mobius.Next
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import safeClassName
-import javax.annotation.processing.Processor
 import javax.lang.model.element.Element
 import kotlin.reflect.KClass
 
-@AutoService(Processor::class)
 class MobiusSwitchboardGenerator : SwitchboardGenerator() {
 
   override val processingHooks: Map<KClass<out Annotation>, (Set<Element>) -> Unit> = mapOf(

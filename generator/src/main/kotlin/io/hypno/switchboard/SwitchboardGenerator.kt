@@ -1,6 +1,5 @@
 package io.hypno.switchboard
 
-import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.*
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
@@ -10,7 +9,6 @@ import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
-import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
@@ -20,7 +18,6 @@ import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 import kotlin.reflect.KClass
 
-@AutoService(Processor::class)
 open class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils {
 
   /**

@@ -2,9 +2,7 @@ package io.hypno.switchboard
 
 import asTypeElement
 import safeClassName
-import com.google.auto.service.AutoService
 import kt.mobius.Next
-import javax.annotation.processing.Processor
 import javax.lang.model.element.Element
 import kotlin.reflect.KClass
 import com.squareup.kotlinpoet.ClassName
@@ -12,7 +10,6 @@ import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
 
-@AutoService(Processor::class)
 class MobiusSwitchboardGenerator : SwitchboardGenerator() {
 
   override val processingHooks: Map<KClass<out Annotation>, (Set<Element>) -> Unit> = mapOf(
