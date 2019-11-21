@@ -29,6 +29,7 @@ open class SwitchboardGenerator : KotlinAbstractProcessor(), KotlinMetadataUtils
   protected open val processingHooks =
       emptyMap<KClass<out Annotation>, (elements: Set<Element>) -> Unit>()
 
+  override fun getSupportedOptions() = setOf("org.gradle.annotation.processing.aggregating")
   override fun getSupportedSourceVersion() = SourceVersion.latest()!!
   override fun getSupportedAnnotationTypes(): Set<String> =
       mutableSetOf(Switchboard::class.qualifiedName!!) +
