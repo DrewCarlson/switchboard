@@ -1,4 +1,4 @@
-package io.hypno.switchboard
+package drewcarlson.switchboard
 
 import com.squareup.kotlinpoet.*
 import safeClassName

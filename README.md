@@ -1,5 +1,5 @@
-[![Release](https://jitpack.io/v/DrewCarlson/switchboard.svg)](https://jitpack.io/#DrewCarlson/switchboard)
 [![CircleCI](https://circleci.com/gh/DrewCarlson/switchboard.svg?style=shield)](https://circleci.com/gh/DrewCarlson/switchboard)
+[![Bintray](https://img.shields.io/badge/dynamic/json.svg?label=Bintray&query=name&style=flat&url=https%3A%2F%2Fbintray.com%2Fapi%2Fv1%2Fpackages%2Fdrewcarlson%2Fswitchboard%2Fapi%2Fversions%2F_latest)](https://bintray.com/drewcarlson/switchboard/)
 
 # switchboard
 Generate Kotlin state mutation specs from sealed classes.
@@ -41,23 +41,23 @@ interface CounterEventSwitchboard {
 ```
 
 ## Download
-Switchboard is available via Jitpack.
+Switchboard is available on jcenter.
 ```groovy
 allprojects {
   repositories {
-    maven { url 'https://jitpack.io' }
+    jcenter()
   }
 }
 ```
 Add the dependency:
 ```groovy
 dependencies {
-  implementation 'com.github.DrewCarlson.switchboard:api:VERSION'
-  kapt 'com.github.DrewCarlson.switchboard:generator:VERSION'
+  implementation 'drewcarlson.switchboard:api:VERSION'
+  kapt 'drewcarlson.switchboard:generator:VERSION'
   
   // Or with Mobius
-  implementation 'com.github.DrewCarlson.switchboard:api-mobius:VERSION'
-  kapt 'com.github.DrewCarlson.switchboard:generator-mobius:VERSION'
+  implementation 'drewcarlson.switchboard:api-mobius:VERSION'
+  kapt 'drewcarlson.switchboard:generator-mobius:VERSION'
 }
 ```
 

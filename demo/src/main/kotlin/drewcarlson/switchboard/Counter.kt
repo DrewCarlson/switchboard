@@ -1,4 +1,7 @@
-package io.hypno.switchboard
+package drewcarlson.switchboard
+
+import drewcarlson.switchboard.CounterEventSwitchboard
+import drewcarlson.switchboard.Switchboard
 
 
 data class CounterState(val count: Int = 0) {

@@ -1,4 +1,4 @@
-package io.hypno.switchboard
+package drewcarlson.switchboard
 
 import kotlin.reflect.KClass
 

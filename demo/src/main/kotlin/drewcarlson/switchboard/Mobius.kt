@@ -1,8 +1,10 @@
-package io.hypno.switchboard
+package drewcarlson.switchboard
 
 import com.spotify.mobius.*
 import com.spotify.mobius.Next.*
 import com.spotify.mobius.functions.Consumer
+import drewcarlson.switchboard.CounterUpdateSpec
+import drewcarlson.switchboard.MobiusUpdateSpec
 
 data class CounterModel(val count: Int = 0) {
   operator fun plus(number: Int) = copy(count = count + number)
